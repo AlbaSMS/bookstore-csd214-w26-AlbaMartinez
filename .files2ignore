@@ -1,4 +1,5 @@
 # .files2ignore GenericPromptGeneratorV3
+.git
 
 # Generator Output & Custom Data
 ai_prompt*
