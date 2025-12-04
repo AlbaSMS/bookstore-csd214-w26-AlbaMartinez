@@ -1,7 +1,3 @@
-#!/bin/bash
-
-# Update README.md to include the documentation image
-cat <<EOF > README.md
 # Bookstore CLI Application
 
 A console-based Java application for managing a bookstore inventory, performing sales, and tracking cash flow. This project demonstrates object-oriented programming concepts including inheritance, polymorphism, and interface implementation in Java 24.
@@ -15,7 +11,7 @@ A console-based Java application for managing a bookstore inventory, performing 
     *   **Tickets:** Simple saleable items with a description and price.
 *   **CRUD Operations:** Add, Edit, and Delete items from the inventory.
 *   **Sales System:** Sell items to decrement inventory count and increase the Cash Till total.
-*   **Data Generation:** Uses \`JavaFaker\` to populate the inventory with realistic dummy data.
+*   **Data Generation:** Uses `JavaFaker` to populate the inventory with realistic dummy data.
 *   **Menu System:** Interactive console menu for navigation.
 
 ## Class Hierarchy
@@ -23,7 +19,7 @@ A console-based Java application for managing a bookstore inventory, performing 
 ![Class Diagram](documentation/bookstore-2025-12-04-213439.png)
 
 The hierarchy implements the following structure:
-*   **SaleableItem (Interface):** Defines \`sellItem()\` and \`getPrice()\`.
+*   **SaleableItem (Interface):** Defines `sellItem()` and `getPrice()`.
 *   **Editable (Abstract):** Handles console input/output and parsing.
 *   **Publication:** Base class for Books and Magazines (Title, Price, Copies).
 
@@ -40,20 +36,20 @@ The hierarchy implements the following structure:
 ## How to Run
 
 1.  **Compile the project:**
-    \`\`\`bash
+    ```bash
     mvn clean compile
-    \`\`\`
+    ```
 
 2.  **Run the application:**
-    \`\`\`bash
+    ```bash
     mvn exec:java -Dexec.mainClass="csd214.bookstore.Main"
-    \`\`\`
+    ```
 
 ## Usage
 
 Upon starting, the application will populate the list with random data. You will see the following menu:
 
-\`\`\`text
+```text
 ***********************
  1. Add Items
  2. Edit Items
@@ -62,7 +58,7 @@ Upon starting, the application will populate the list with random data. You will
  5. List items
 99. Quit
 ***********************
-\`\`\`
+```
 
 *   **Add Items:** Choose a specific type (Book, Magazine, etc.) and follow the prompts.
 *   **Edit Items:** Select an index from the list to modify fields.
@@ -74,13 +70,13 @@ Unit tests are implemented using JUnit 5 to verify the logic of POJOs and input 
 
 Run the tests using Maven:
 
-\`\`\`bash
+```bash
 mvn test
-\`\`\`
+```
 
 ## Project Structure
 
-\`\`\`
+```
 src/
 ├── main/
 │   └── java/
@@ -103,7 +99,4 @@ src/
         └── csd214/
             └── bookstore/
                 └── pojos/              # Unit Tests
-\`\`\`
-EOF
-
-echo "README.md updated with image link."
+```
