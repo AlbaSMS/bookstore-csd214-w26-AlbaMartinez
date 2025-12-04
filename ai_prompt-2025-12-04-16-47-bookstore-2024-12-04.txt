@@ -1,0 +1,182 @@
+Context generated from: /home/fcarella/IdeaProjects/bookstore/2024-12-04/bookstore-2024-12-04
+Timestamp: 2025-12-04-16-47
+--------------------------------------------------
+
+--- FILE: .gitignore ---
+```
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+```
+
+
+--- FILE: pom.xml ---
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>app</groupId>
+    <artifactId>bookstore-2024-12-04</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>24</maven.compiler.source>
+        <maven.compiler.target>24</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+</project>
+```
+
+
+--- FILE: src/main/java/csd214/bookstore/Main.java ---
+```
+package csd214.bookstore;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Bookstore Application Started");
+        new App().run();
+    }
+}
+
+```
+
+
+--- FILE: src/main/java/csd214/bookstore/App.java ---
+```
+package csd214.bookstore;
+
+public class App {
+    public void run() {
+
+    }
+}
+
+```
+
+
+--- FILE: .files2ignore ---
+```
+# .files2ignore GenericPromptGeneratorV3
+
+# Generator Output & Custom Data
+ai_prompt*
+Timeline*.json
+assets/
+
+### Node / NPM / Express / React ###
+node_modules/
+package-lock.json
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+
+# Environment Variables (Security: Never upload secrets)
+.env
+.env.local
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Framework specific
+.next/
+.nuxt/
+dist-ssr
+*.local
+
+### Spring Boot / Java ###
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IDEs / Editors ###
+
+# IntelliJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+
+# STS / Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# OS / Misc
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+```
+
+
