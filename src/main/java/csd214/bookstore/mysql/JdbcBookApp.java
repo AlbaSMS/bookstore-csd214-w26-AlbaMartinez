@@ -1,9 +1,3 @@
-#!/bin/bash
-
-PACKAGE_DIR="src/main/java/csd214/bookstore/mysql"
-mkdir -p "$PACKAGE_DIR"
-
-cat <<EOF > "$PACKAGE_DIR/JdbcBookApp.java"
 package csd214.bookstore.mysql;
 
 import csd214.bookstore.pojos.Book;
@@ -138,4 +132,3 @@ public class JdbcBookApp {
         }
     }
 }
-EOF
