@@ -1,109 +1,179 @@
 #!/bin/bash
 
-# Update README.md to include the documentation image
-cat <<EOF > README.md
-# Bookstore CLI Application
+ENTITY_DIR="src/main/java/csd214/bookstore/jpa/entities"
 
-A console-based Java application for managing a bookstore inventory, performing sales, and tracking cash flow. This project demonstrates object-oriented programming concepts including inheritance, polymorphism, and interface implementation in Java 24.
+# 1. Update ProductEntity
+# - Adds implements SaleableItem
+# - Imports the interface
+cat <<EOF > "$ENTITY_DIR/ProductEntity.java"
+package csd214.bookstore.jpa.entities;
 
-## Features
+import jakarta.persistence.*;
+import csd214.bookstore.pojos.SaleableItem;
+import java.io.Serializable;
 
-*   **Inventory Management:**
-    *   **Books:** Manage items with Title, Author, Price, and Copies.
-    *   **Magazines:** Manage periodicals with Order Quantity and Issue Date.
-    *   **Disc Magazines:** Specialized magazines that include a disc.
-    *   **Tickets:** Simple saleable items with a description and price.
-*   **CRUD Operations:** Add, Edit, and Delete items from the inventory.
-*   **Sales System:** Sell items to decrement inventory count and increase the Cash Till total.
-*   **Data Generation:** Uses \`JavaFaker\` to populate the inventory with realistic dummy data.
-*   **Menu System:** Interactive console menu for navigation.
+@Entity
+@Table(name = "products")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "product_type", discriminatorType = DiscriminatorType.STRING)
+public abstract class ProductEntity implements Serializable, SaleableItem {
 
-## Class Hierarchy
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-![Class Diagram](documentation/bookstore-2025-12-04-213439.png)
+    public Long getId() {
+        return id;
+    }
 
-The hierarchy implements the following structure:
-*   **SaleableItem (Interface):** Defines \`sellItem()\` and \`getPrice()\`.
-*   **Editable (Abstract):** Handles console input/output and parsing.
-*   **Publication:** Base class for Books and Magazines (Title, Price, Copies).
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-## Prerequisites
+    // Abstract method from SaleableItem.
+    // Children (Ticket, Publication) already have getPrice(), so that satisfies the interface.
+    // We leave sellItem() for children to implement specific logic.
 
-*   **Java JDK:** Version 24
-*   **Maven:** 3.6+
-
-## Dependencies
-
-*   [JavaFaker](https://github.com/DiUS/java-faker) (1.0.2): For generating random test data.
-*   [JUnit 5](https://junit.org/junit5/) (5.10.0): For unit testing.
-
-## How to Run
-
-1.  **Compile the project:**
-    \`\`\`bash
-    mvn clean compile
-    \`\`\`
-
-2.  **Run the application:**
-    \`\`\`bash
-    mvn exec:java -Dexec.mainClass="csd214.bookstore.Main"
-    \`\`\`
-
-## Usage
-
-Upon starting, the application will populate the list with random data. You will see the following menu:
-
-\`\`\`text
-***********************
- 1. Add Items
- 2. Edit Items
- 3. Delete Items
- 4. Sell item(s)
- 5. List items
-99. Quit
-***********************
-\`\`\`
-
-*   **Add Items:** Choose a specific type (Book, Magazine, etc.) and follow the prompts.
-*   **Edit Items:** Select an index from the list to modify fields.
-*   **Sell Items:** Select an index to sell. This decreases the 'Copies' count (for Publications) and adds the price to the internal Cash Till.
-
-## Running Tests
-
-Unit tests are implemented using JUnit 5 to verify the logic of POJOs and input mocking.
-
-Run the tests using Maven:
-
-\`\`\`bash
-mvn test
-\`\`\`
-
-## Project Structure
-
-\`\`\`
-src/
-├── main/
-│   └── java/
-│       └── csd214/
-│           └── bookstore/
-│               ├── Main.java           # Entry point
-│               ├── App.java            # Controller / Menu Logic
-│               └── pojos/              # Data Models
-│                   ├── Editable.java
-│                   ├── SaleableItem.java
-│                   ├── Product.java
-│                   ├── Publication.java
-│                   ├── Book.java
-│                   ├── Magazine.java
-│                   ├── DiscMag.java
-│                   ├── Ticket.java
-│                   └── CashTill.java
-└── test/
-    └── java/
-        └── csd214/
-            └── bookstore/
-                └── pojos/              # Unit Tests
-\`\`\`
+    @Override
+    public String toString() {
+        return "ProductEntity{id=" + id + "}";
+    }
+}
 EOF
 
-echo "README.md updated with image link."
+# 2. Update TicketEntity
+# - Implements sellItem() (Simple print, infinite stock)
+cat <<EOF > "$ENTITY_DIR/TicketEntity.java"
+package csd214.bookstore.jpa.entities;
+
+import jakarta.persistence.*;
+
+@Entity
+@DiscriminatorValue("TICKET")
+public class TicketEntity extends ProductEntity {
+
+    private String description;
+
+    @Column(name = "ticket_price")
+    private double price;
+
+    public TicketEntity() {}
+
+    public TicketEntity(String description, double price) {
+        this.description = description;
+        this.price = price;
+    }
+
+    // --- SaleableItem Implementation ---
+    @Override
+    public void sellItem() {
+        System.out.println("Selling Ticket: " + description + " for $" + price);
+    }
+
+    @Override
+    public double getPrice() {
+        return price;
+    }
+    // -----------------------------------
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "TicketEntity{" +
+                "id=" + getId() +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                '}';
+    }
+}
+EOF
+
+# 3. Update PublicationEntity
+# - Implements sellItem() (Decrements copies)
+cat <<EOF > "$ENTITY_DIR/PublicationEntity.java"
+package csd214.bookstore.jpa.entities;
+
+import jakarta.persistence.*;
+
+@Entity
+public abstract class PublicationEntity extends ProductEntity {
+
+    private String title;
+
+    @Column(name = "pub_price")
+    private double price;
+
+    private int copies;
+
+    public PublicationEntity() {}
+
+    public PublicationEntity(String title, double price, int copies) {
+        this.title = title;
+        this.price = price;
+        this.copies = copies;
+    }
+
+    // --- SaleableItem Implementation ---
+    @Override
+    public void sellItem() {
+        if (copies > 0) {
+            copies--;
+            System.out.println("Sold '" + title + "'. Remaining copies: " + copies);
+        } else {
+            System.out.println("Cannot sell '" + title + "'. Out of stock.");
+        }
+    }
+
+    @Override
+    public double getPrice() {
+        return price;
+    }
+    // -----------------------------------
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getCopies() {
+        return copies;
+    }
+
+    public void setCopies(int copies) {
+        this.copies = copies;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " PublicationEntity{" +
+                "title='" + title + '\'' +
+                ", price=" + price +
+                ", copies=" + copies +
+                '}';
+    }
+}
+EOF
+
+# Note: BookEntity, MagazineEntity, and DiscMagEntity inherit from PublicationEntity.
+# They automatically inherit the sellItem() logic (decrementing copies) defined above.
+# We don't need to modify them unless they need specific selling behavior.
+
+echo "Entities updated: ProductEntity now implements SaleableItem."
