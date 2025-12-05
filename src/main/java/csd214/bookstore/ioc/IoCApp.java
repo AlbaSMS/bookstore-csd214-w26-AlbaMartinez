@@ -1,64 +1,3 @@
-#!/bin/bash
-
-# Ensure we are in the correct directory/branch
-# git checkout step_04-services-repositories-and-ioc
-
-IOC_DIR="src/main/java/csd214/bookstore/ioc"
-
-echo "Creating distinct Repository classes..."
-
-# ---------------------------------------------------------
-# 1. Create H2Repository (Specific Implementation)
-# ---------------------------------------------------------
-# This class specifically loads the 'h2-pu' configuration.
-cat <<EOF > "$IOC_DIR/H2Repository.java"
-package csd214.bookstore.ioc;
-
-import jakarta.persistence.Persistence;
-
-/**
- * A concrete Repository implementation specifically for H2.
- * It hardcodes the persistence unit name "h2-pu".
- */
-public class H2Repository extends JpaRepository {
-
-    public H2Repository() {
-        // We call the parent constructor, injecting the H2-specific factory
-        super(Persistence.createEntityManagerFactory("h2-pu"), "H2 (Distinct Class)");
-    }
-
-    // You could add H2-specific methods here if needed
-}
-EOF
-
-# ---------------------------------------------------------
-# 2. Create MySqlRepository (Specific Implementation)
-# ---------------------------------------------------------
-# This class specifically loads the 'mysql-pu' configuration.
-cat <<EOF > "$IOC_DIR/MySqlRepository.java"
-package csd214.bookstore.ioc;
-
-import jakarta.persistence.Persistence;
-
-/**
- * A concrete Repository implementation specifically for MySQL.
- * It hardcodes the persistence unit name "mysql-pu".
- */
-public class MySqlRepository extends JpaRepository {
-
-    public MySqlRepository() {
-        // We call the parent constructor, injecting the MySQL-specific factory
-        super(Persistence.createEntityManagerFactory("mysql-pu"), "MySQL (Distinct Class)");
-    }
-
-    // You could add MySQL-specific optimizations here if needed
-}
-EOF
-
-# ---------------------------------------------------------
-# 3. Update IoCApp to show all options
-# ---------------------------------------------------------
-cat <<EOF > "$IOC_DIR/IoCApp.java"
 package csd214.bookstore.ioc;
 
 import jakarta.persistence.Persistence;
@@ -122,6 +61,3 @@ public class IoCApp {
         System.exit(0);
     }
 }
-EOF
-
-echo "Specific repositories created and IoCApp updated."
