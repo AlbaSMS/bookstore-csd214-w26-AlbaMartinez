@@ -1,5 +1,5 @@
 # Bookstore CLI Application
->branch step_00
+> branch step_00
 
 A console-based Java application for managing a bookstore inventory, performing sales, and tracking cash flow. This project demonstrates object-oriented programming concepts including inheritance, polymorphism, and interface implementation in Java 24.
 
@@ -101,3 +101,15 @@ src/
             └── bookstore/
                 └── pojos/              # Unit Tests
 ```
+
+## Branch Roadmap
+
+This project is structured into branches to demonstrate the progressive architectural evolution of the application:
+
+*   **`step_00`**: The base console application (same as master). Uses in-memory `ArrayList` storage and POJOs.
+*   **`step_01-jdbc`**: Introduces persistence using **MySQL** (via Docker) and **JDBC**. Demonstrates raw SQL `PreparedStatement` operations for CRUD logic.
+*   **`step_02-jpa`**: Migrates to **Hibernate/JPA**. Converts POJOs to Entities (`@Entity`) using Single Table Inheritance and configures `persistence.xml`.
+*   **`step_03-repositories`**: Implements the **Repository Pattern**. Abstracts data access behind a generic `IRepository` interface to decouple business logic from the .
+*   **`step_04-services-repositories-and-ioc`**: Implements **Inversion of Control** and a **Service Layer**.
+    *   Adds **H2 Database** support for in-memory SQL testing.
+    *   Demonstrates **Dependency Injection** by swapping Repository implementations (MySQL vs. H2 vs. In-Memory) at runtime without changing the Service code.
