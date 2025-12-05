@@ -7,8 +7,7 @@ import jakarta.persistence.*;
 public class TicketEntity extends ProductEntity {
 
     private String description;
-
-    // Mapping to a specific column to avoid conflict with Publication's price
+    
     @Column(name = "ticket_price")
     private double price;
 
@@ -19,16 +18,22 @@ public class TicketEntity extends ProductEntity {
         this.price = price;
     }
 
+    @Override
+    public void sellItem() {
+        System.out.println("Selling Ticket: " + description + " for $" + price);
+    }
+
+    @Override
+    public double getPrice() {
+        return price;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public double getPrice() {
-        return price;
     }
 
     public void setPrice(double price) {

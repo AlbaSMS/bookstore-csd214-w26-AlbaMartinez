@@ -3,15 +3,13 @@ package csd214.bookstore.jpa.entities;
 import jakarta.persistence.*;
 
 @Entity
-// We don't strictly need a DiscriminatorValue if we never instantiate PublicationEntity directly,
-// but Hibernate might require it for the hierarchy.
 public abstract class PublicationEntity extends ProductEntity {
 
     private String title;
-
+    
     @Column(name = "pub_price")
     private double price;
-
+    
     private int copies;
 
     public PublicationEntity() {}
@@ -22,16 +20,27 @@ public abstract class PublicationEntity extends ProductEntity {
         this.copies = copies;
     }
 
+    @Override
+    public void sellItem() {
+        if (copies > 0) {
+            copies--;
+            System.out.println("Sold '" + title + "'. Remaining copies: " + copies);
+        } else {
+            System.out.println("Cannot sell '" + title + "'. Out of stock.");
+        }
+    }
+
+    @Override
+    public double getPrice() {
+        return price;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public double getPrice() {
-        return price;
     }
 
     public void setPrice(double price) {
