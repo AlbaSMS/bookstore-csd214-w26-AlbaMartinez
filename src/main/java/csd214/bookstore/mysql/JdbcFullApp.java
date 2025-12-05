@@ -1,12 +1,3 @@
-#!/bin/bash
-
-# 1. Switch to the correct branch
-git checkout step_01-jdbc
-
-# 2. Overwrite JdbcFullApp.java with the DROP TABLE logic
-PACKAGE_DIR="src/main/java/csd214/bookstore/mysql"
-
-cat <<EOF > "$PACKAGE_DIR/JdbcFullApp.java"
 package csd214.bookstore.mysql;
 
 import csd214.bookstore.pojos.*;
@@ -214,6 +205,3 @@ public class JdbcFullApp {
         }
     }
 }
-EOF
-
-echo "JdbcFullApp.java updated. It will now DROP the 'products' table before creating it."
