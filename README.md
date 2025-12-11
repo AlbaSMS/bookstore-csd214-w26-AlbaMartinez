@@ -1,7 +1,8 @@
 # Bookstore CLI Application
-> branch step_00
-
 A console-based Java application for managing a bookstore inventory, performing sales, and tracking cash flow. This project demonstrates object-oriented programming concepts including inheritance, polymorphism, and interface implementation in Java 24.
+> this app consists of [6 branches...](https://github.com/fcarella/bookstore-2025-12-04/branches)
+(see the [branch roadmap](#branch-roadmap))
+
 
 ## Features
 
