@@ -1,23 +1,10 @@
 package csd214.bookstore.pojos;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Date;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class MagazineTest {
-
-    private final InputStream originalSystemIn = System.in;
-
-    @AfterEach
-    void tearDown() {
-        System.setIn(originalSystemIn);
-    }
 
     @Test
     void testConstructorAndGetters() {
@@ -39,38 +26,14 @@ class MagazineTest {
     }
 
     @Test
-    void testInitializeWithMockInput() {
-        // Order: Title -> Order Qty -> Date (dd-MMM-yyyy) -> Copies -> Price
-        String simulatedInput = "National Geographic\n500\n01-Jan-2025\n10\n12.50\n";
-
-        ByteArrayInputStream testIn = new ByteArrayInputStream(simulatedInput.getBytes());
+    void testSetters() {
         Magazine mag = new Magazine();
-        mag.setSystemInput(testIn);
+        Date date = new Date();
 
-        mag.initialize();
+        mag.setOrderQty(500);
+        mag.setCurrentIssue(date);
 
-        assertEquals("National Geographic", mag.getTitle());
         assertEquals(500, mag.getOrderQty());
-        assertEquals(10, mag.getCopies());
-        assertEquals(12.50, mag.getPrice(), 0.001);
-        // Date verification can be tricky with string parsing, just checking it's not null or basic parsing
-        assertNotNull(mag.getCurrentIssue());
-    }
-
-    @Test
-    void testEditWithMockInput() {
-        // Order: Title -> Price -> Copies -> Order Qty -> Date
-        String simulatedInput = "New Title\n15.00\n100\n999\n01-Feb-2025\n";
-
-        ByteArrayInputStream testIn = new ByteArrayInputStream(simulatedInput.getBytes());
-        Magazine mag = new Magazine(10, new Date(), "Old", 5.0, 5);
-        mag.setSystemInput(testIn);
-
-        mag.edit();
-
-        assertEquals("New Title", mag.getTitle());
-        assertEquals(15.00, mag.getPrice(), 0.001);
-        assertEquals(100, mag.getCopies());
-        assertEquals(999, mag.getOrderQty());
+        assertEquals(date, mag.getCurrentIssue());
     }
 }

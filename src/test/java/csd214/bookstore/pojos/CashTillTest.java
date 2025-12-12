@@ -10,7 +10,8 @@ class CashTillTest {
         CashTill till = new CashTill();
         assertEquals(0.0, till.getRunningTotal(), 0.001);
 
-        // Create a dummy saleable item
+        // We can still use an anonymous inner class to mock the SaleableItem interface
+        // This proves that CashTill is decoupled from Book/Magazine
         SaleableItem item = new SaleableItem() {
             @Override
             public void sellItem() { }
