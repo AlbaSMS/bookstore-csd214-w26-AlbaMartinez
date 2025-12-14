@@ -1,5 +1,6 @@
 # .files2ignore GenericPromptGeneratorV3
 .git
+volumes/
 
 # Generator Output & Custom Data
 ai_prompt*
