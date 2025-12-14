@@ -5,6 +5,7 @@
 ai_prompt*
 Timeline*.json
 assets/
+volumes/
 
 ### Node / NPM / Express / React ###
 node_modules/
