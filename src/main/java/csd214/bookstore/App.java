@@ -1,19 +1,43 @@
 package csd214.bookstore;
 
+import csd214.bookstore.ioc.IRepository;
+import csd214.bookstore.jpa.entities.*;
 import csd214.bookstore.pojos.*;
 import com.github.javafaker.Faker;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The Controller / UI Layer.
+ *
+ * CHANGE LOG:
+ * - Removed 'new ProductRepository()'
+ * - Added Constructor Injection for IRepository
+ * - This class is now 100% decoupled from the database implementation.
+ */
 public class App {
-    private List<SaleableItem> items = new ArrayList<>();
+
+    // Dependency: Interface only. No concrete class.
+    private IRepository repository;
+
     private CashTill cashTill = new CashTill();
     private Scanner input = new Scanner(System.in);
 
+    // Constructor Injection
+    public App(IRepository repository) {
+        this.repository = repository;
+    }
+
     public void run() {
-        populate();
+        System.out.println("App running with: " + repository.getDataSourceType());
+
+        // Pre-fill DB if empty
+        if (repository.findAll().isEmpty()) {
+            populate();
+        }
+
         int choice = 0;
         while (choice != 99) {
             System.out.println("\n***********************");
@@ -52,7 +76,9 @@ public class App {
                     listAny();
                     break;
                 case 99:
-                    // Exit
+                    System.out.println("Exiting...");
+                    // No need to close() explicit resources here usually,
+                    // but if the repo has a close method, we might call it.
                     break;
                 default:
                     System.out.println("Invalid choice.");
@@ -60,213 +86,282 @@ public class App {
         }
     }
 
-    public void addItem() {
-        int choice = 0;
-        while (choice != 99) {
-            System.out.println("\nAdd an item\n");
-            System.out.println("1. Add Book");
-            System.out.println("2. Add Magazine");
-            System.out.println("3. Add DiscMag");
-            System.out.println("4. Add Ticket");
-            System.out.println("99. Exit");
-
-            try {
-                String line = input.nextLine();
-                if (line.trim().isEmpty()) continue;
-                choice = Integer.parseInt(line.trim());
-            } catch (NumberFormatException e) {
-                choice = 0;
-            }
-
-            if (choice == 99) return;
-
-            SaleableItem item = null;
-            switch(choice) {
-                case 1: item = new Book(); break;
-                case 2: item = new Magazine(); break;
-                case 3: item = new DiscMag(); break;
-                case 4: item = new Ticket(); break;
-                default: System.out.println("Invalid selection."); continue;
-            }
-
-            if(item instanceof Editable) {
-                ((Editable)item).initialize();
-            }
-            addItem(item);
-        }
-    }
-
-    public void addItem(SaleableItem item) {
-        items.add(item);
-    }
+    // ==========================================
+    // CRUD: READ
+    // ==========================================
 
     public void listAny() {
-        int choice = 0;
-        while (choice != 99) {
-            System.out.println("\nAll Items");
-            System.out.println("-----------");
-            System.out.println("List");
-            System.out.println("1. All");
-            System.out.println("2. Books");
-            System.out.println("3. Magazines");
-            System.out.println("4. DiscMags");
-            System.out.println("5. Tickets");
-            System.out.println("99. Exit");
+        System.out.println("\nAll Items");
+        System.out.println("----------------------------------");
 
-            try {
-                String line = input.nextLine();
-                if (line.trim().isEmpty()) continue;
-                choice = Integer.parseInt(line.trim());
-            } catch (NumberFormatException e) {
-                choice = 0;
-            }
+        List<ProductEntity> dbList = repository.findAll();
 
-            if (choice == 99) return;
+        if (dbList.isEmpty()) {
+            System.out.println("Inventory is empty.");
+            return;
+        }
 
-            Class<?> filter = null;
-            switch(choice) {
-                case 1: filter = null; break;
-                case 2: filter = Book.class; break;
-                case 3: filter = Magazine.class; break;
-                case 4: filter = DiscMag.class; break;
-                case 5: filter = Ticket.class; break;
-                default: System.out.println("Invalid selection."); continue;
-            }
-
-            for (SaleableItem i : items) {
-                boolean show = false;
-                if (filter == null) {
-                    show = true;
-                } else {
-                    if (filter == Magazine.class && i instanceof DiscMag) {
-                        show = false;
-                    } else if (filter.isInstance(i)) {
-                        show = true;
-                    }
-                }
-
-                if (show) {
-                    listI(i);
-                }
-            }
+        for (int i = 0; i < dbList.size(); i++) {
+            ProductEntity entity = dbList.get(i);
+            SaleableItem pojo = mapToPojo(entity);
+            System.out.println(i + ". " + pojo.toString());
         }
     }
 
-    public void listI(Object o) {
-        System.out.println(o.toString());
+    // ==========================================
+    // CRUD: CREATE
+    // ==========================================
+
+    public void addItem() {
+        System.out.println("\nAdd an item");
+        System.out.println("1. Add Book");
+        System.out.println("2. Add Magazine");
+        System.out.println("3. Add DiscMag");
+        System.out.println("4. Add Ticket");
+        System.out.println("99. Back");
+
+        int choice = 0;
+        try {
+            String line = input.nextLine();
+            choice = Integer.parseInt(line.trim());
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        if (choice == 99) return;
+
+        SaleableItem pojo = null;
+        switch (choice) {
+            case 1: pojo = new Book(); break;
+            case 2: pojo = new Magazine(); break;
+            case 3: pojo = new DiscMag(); break;
+            case 4: pojo = new Ticket(); break;
+            default: System.out.println("Invalid selection."); return;
+        }
+
+        if (pojo instanceof Editable) {
+            ((Editable) pojo).initialize();
+        }
+
+        ProductEntity entity = mapToEntity(pojo);
+
+        try {
+            repository.save(entity);
+            System.out.println("Saved: " + entity.getClass().getSimpleName());
+        } catch (Exception e) {
+            System.out.println("Failed to save item: " + e.getMessage());
+        }
     }
 
+    // ==========================================
+    // CRUD: UPDATE
+    // ==========================================
+
     public void editItem() {
-        System.out.println("Select item index to edit (0 to " + (items.size() - 1) + "):");
-        for(int i=0; i<items.size(); i++) {
-            System.out.println(i + ". " + items.get(i));
+        List<ProductEntity> dbList = repository.findAll();
+
+        System.out.println("Select item index to edit:");
+        for (int i = 0; i < dbList.size(); i++) {
+            System.out.println(i + ". " + mapToPojo(dbList.get(i)));
         }
 
         try {
             int idx = Integer.parseInt(input.nextLine().trim());
-            if (idx >= 0 && idx < items.size()) {
-                SaleableItem item = items.get(idx);
-                if (item instanceof Editable) {
-                    editItem((Editable) item);
+            if (idx >= 0 && idx < dbList.size()) {
+                ProductEntity entity = dbList.get(idx);
+                SaleableItem pojo = mapToPojo(entity);
+
+                if (pojo instanceof Editable) {
+                    ((Editable) pojo).edit();
+                    updateEntityFromPojo(entity, pojo);
+
+                    repository.save(entity);
+                    System.out.println("Item updated.");
                 } else {
                     System.out.println("Item is not editable.");
                 }
             }
         } catch (Exception e) {
-            System.out.println("Invalid selection.");
+            System.out.println("Invalid selection or error.");
+            e.printStackTrace();
         }
     }
 
-    public void editItem(Editable item) {
-        item.edit();
-    }
+    // ==========================================
+    // CRUD: DELETE
+    // ==========================================
 
     public void deleteItem() {
+        List<ProductEntity> dbList = repository.findAll();
+
         System.out.println("Select item index to delete:");
-        for(int i=0; i<items.size(); i++) {
-            System.out.println(i + ". " + items.get(i));
+        for (int i = 0; i < dbList.size(); i++) {
+            System.out.println(i + ". " + mapToPojo(dbList.get(i)));
         }
+
         try {
             int idx = Integer.parseInt(input.nextLine().trim());
-            if (idx >= 0 && idx < items.size()) {
-                items.remove(idx);
+            if (idx >= 0 && idx < dbList.size()) {
+                ProductEntity entity = dbList.get(idx);
+                repository.delete(entity.getId());
                 System.out.println("Item deleted.");
             }
         } catch (Exception e) {
-            System.out.println("Invalid selection.");
+            System.out.println("Error deleting item.");
         }
     }
+
+    // ==========================================
+    // LOGIC: SALES
+    // ==========================================
 
     public void sellItem() {
+        List<ProductEntity> dbList = repository.findAll();
+
         System.out.println("Select item index to sell:");
-        for(int i=0; i<items.size(); i++) {
-            System.out.println(i + ". " + items.get(i));
+        for (int i = 0; i < dbList.size(); i++) {
+            System.out.println(i + ". " + mapToPojo(dbList.get(i)));
         }
+
         try {
             int idx = Integer.parseInt(input.nextLine().trim());
-            if (idx >= 0 && idx < items.size()) {
-                SaleableItem item = items.get(idx);
-                cashTill.sellItem(item);
+            if (idx >= 0 && idx < dbList.size()) {
+                ProductEntity entity = dbList.get(idx);
+                SaleableItem pojo = mapToPojo(entity);
+
+                pojo.sellItem();
+                cashTill.sellItem(pojo);
+
+                if (entity instanceof PublicationEntity && pojo instanceof Publication) {
+                    ((PublicationEntity) entity).setCopies(((Publication) pojo).getCopies());
+                    repository.save(entity);
+                    System.out.println("Inventory count updated.");
+                }
             }
         } catch (Exception e) {
-            System.out.println("Invalid selection.");
+            System.out.println("Error processing sale.");
         }
     }
 
-    public boolean findItemExists(SaleableItem item) {
-        return items.contains(item);
+    // ==========================================
+    // MAPPERS
+    // ==========================================
+
+    private SaleableItem mapToPojo(ProductEntity entity) {
+        if (entity instanceof BookEntity) {
+            BookEntity e = (BookEntity) entity;
+            return new Book(e.getAuthor(), e.getTitle(), e.getPrice(), e.getCopies());
+        }
+        else if (entity instanceof DiscMagEntity) {
+            DiscMagEntity e = (DiscMagEntity) entity;
+            return new DiscMag(e.isHasDisc(), e.getOrderQty(), e.getCurrentIssue(), e.getTitle(), e.getPrice(), e.getCopies());
+        }
+        else if (entity instanceof MagazineEntity) {
+            MagazineEntity e = (MagazineEntity) entity;
+            return new Magazine(e.getOrderQty(), e.getCurrentIssue(), e.getTitle(), e.getPrice(), e.getCopies());
+        }
+        else if (entity instanceof TicketEntity) {
+            TicketEntity e = (TicketEntity) entity;
+            Ticket p = new Ticket();
+            p.description = e.getDescription();
+            p.price = e.getPrice();
+            return p;
+        }
+        throw new IllegalArgumentException("Unknown Entity Type: " + entity.getClass());
     }
 
-    public SaleableItem findItem(SaleableItem item) {
-        int index = items.indexOf(item);
-        if (index != -1) return items.get(index);
-        return null;
+    private ProductEntity mapToEntity(SaleableItem pojo) {
+        if (pojo instanceof Book) {
+            Book p = (Book) pojo;
+            return new BookEntity(p.getTitle(), p.getPrice(), p.getCopies(), p.getAuthor());
+        }
+        else if (pojo instanceof DiscMag) {
+            DiscMag p = (DiscMag) pojo;
+            return new DiscMagEntity(p.getTitle(), p.getPrice(), p.getCopies(), p.getOrderQty(), p.getCurrentIssue(), p.isHasDisc());
+        }
+        else if (pojo instanceof Magazine) {
+            Magazine p = (Magazine) pojo;
+            return new MagazineEntity(p.getTitle(), p.getPrice(), p.getCopies(), p.getOrderQty(), p.getCurrentIssue());
+        }
+        else if (pojo instanceof Ticket) {
+            Ticket p = (Ticket) pojo;
+            return new TicketEntity(p.description, p.price);
+        }
+        throw new IllegalArgumentException("Unknown POJO Type: " + pojo.getClass());
     }
 
-    public SaleableItem getItem(SaleableItem item) {
-        return findItem(item);
+    private void updateEntityFromPojo(ProductEntity entity, SaleableItem pojo) {
+        if (entity instanceof PublicationEntity && pojo instanceof Publication) {
+            PublicationEntity pe = (PublicationEntity) entity;
+            Publication pp = (Publication) pojo;
+            pe.setTitle(pp.getTitle());
+            pe.setPrice(pp.getPrice());
+            pe.setCopies(pp.getCopies());
+        }
+
+        if (entity instanceof BookEntity && pojo instanceof Book) {
+            ((BookEntity) entity).setAuthor(((Book) pojo).getAuthor());
+        }
+        else if (entity instanceof MagazineEntity && pojo instanceof Magazine) {
+            MagazineEntity me = (MagazineEntity) entity;
+            Magazine mp = (Magazine) pojo;
+            me.setOrderQty(mp.getOrderQty());
+            me.setCurrentIssue(mp.getCurrentIssue());
+
+            if (entity instanceof DiscMagEntity && pojo instanceof DiscMag) {
+                ((DiscMagEntity) me).setHasDisc(((DiscMag) mp).isHasDisc());
+            }
+        }
+        else if (entity instanceof TicketEntity && pojo instanceof Ticket) {
+            TicketEntity te = (TicketEntity) entity;
+            Ticket tp = (Ticket) pojo;
+            te.setDescription(tp.description);
+            te.setPrice(tp.price);
+        }
     }
+
+    // ==========================================
+    // DATA SEEDING
+    // ==========================================
 
     public void populate() {
-        System.out.println("Populating data with JavaFaker...");
+        System.out.println("Seeding Database with JavaFaker...");
         Faker faker = new Faker();
 
         for (int i = 0; i < 2; i++) {
-            // Book
-            Book b = new Book(
-                    faker.book().author(),
+            BookEntity b = new BookEntity(
                     faker.book().title(),
-                    faker.number().randomDouble(2, 10, 50), // Price
-                    faker.number().numberBetween(1, 20)     // Copies
+                    faker.number().randomDouble(2, 10, 50),
+                    faker.number().numberBetween(1, 20),
+                    faker.book().author()
             );
-            addItem(b);
+            repository.save(b);
 
-            // Magazine
-            Magazine m = new Magazine(
-                    faker.number().numberBetween(100, 500), // Order Qty
-                    faker.date().past(30, TimeUnit.DAYS),   // Date
-                    faker.book().title() + " Monthly",      // Title
-                    faker.number().randomDouble(2, 5, 15),  // Price
-                    faker.number().numberBetween(5, 50)     // Copies
+            MagazineEntity m = new MagazineEntity(
+                    faker.book().title() + " Monthly",
+                    faker.number().randomDouble(2, 5, 15),
+                    faker.number().numberBetween(5, 50),
+                    faker.number().numberBetween(100, 500),
+                    faker.date().past(30, TimeUnit.DAYS)
             );
-            addItem(m);
+            repository.save(m);
 
-            // DiscMag
-            DiscMag dm = new DiscMag(
-                    faker.bool().bool(),                    // Has Disc
-                    faker.number().numberBetween(50, 200),  // Order Qty
-                    faker.date().past(60, TimeUnit.DAYS),   // Date
-                    "Tech Disc: " + faker.app().name(),     // Title
-                    faker.number().randomDouble(2, 10, 25), // Price
-                    faker.number().numberBetween(5, 30)     // Copies
+            DiscMagEntity dm = new DiscMagEntity(
+                    "Tech: " + faker.app().name(),
+                    faker.number().randomDouble(2, 10, 25),
+                    faker.number().numberBetween(5, 30),
+                    faker.number().numberBetween(50, 200),
+                    faker.date().past(60, TimeUnit.DAYS),
+                    faker.bool().bool()
             );
-            addItem(dm);
+            repository.save(dm);
 
-            // Ticket
-            Ticket t = new Ticket();
-            t.description = "Concert: " + faker.rockBand().name();
-            t.price = faker.number().randomDouble(2, 50, 150);
-            addItem(t);
+            TicketEntity t = new TicketEntity(
+                    "Concert: " + faker.rockBand().name(),
+                    faker.number().randomDouble(2, 50, 150)
+            );
+            repository.save(t);
         }
+        System.out.println("Database Seeded.");
     }
 }
