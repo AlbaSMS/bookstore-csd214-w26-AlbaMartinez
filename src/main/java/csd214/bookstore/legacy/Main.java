@@ -1,6 +1,6 @@
-package csd214.bookstore;
+package csd214.bookstore.legacy;
 
-import csd214.bookstore.ioc.*;
+import csd214.bookstore.legacy.ioc.*;
 import java.util.Scanner;
 
 public class Main {
@@ -45,7 +45,7 @@ public class Main {
         // --- INJECTION PHASE ---
         // We inject the chosen repository into the App.
         // App doesn't know (or care) which one it got.
-        App app = new App(repository);
+        LegacyApp app = new LegacyApp(repository);
 
         // Run the application
         app.run();

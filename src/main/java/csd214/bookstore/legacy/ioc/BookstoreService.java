@@ -1,4 +1,4 @@
-package csd214.bookstore.ioc;
+package csd214.bookstore.legacy.ioc;
 import csd214.bookstore.jpa.entities.*;
 import java.util.Date;
 import java.util.List;

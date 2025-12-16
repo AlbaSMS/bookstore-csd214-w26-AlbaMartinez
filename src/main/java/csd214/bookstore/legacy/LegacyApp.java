@@ -1,6 +1,6 @@
-package csd214.bookstore;
+package csd214.bookstore.legacy;
 
-import csd214.bookstore.ioc.IRepository;
+import csd214.bookstore.legacy.ioc.IRepository;
 import csd214.bookstore.jpa.entities.*;
 import csd214.bookstore.pojos.*;
 import com.github.javafaker.Faker;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * - Added Constructor Injection for IRepository
  * - This class is now 100% decoupled from the database implementation.
  */
-public class App {
+public class LegacyApp {
 
     // Dependency: Interface only. No concrete class.
     private IRepository repository;
@@ -26,7 +26,7 @@ public class App {
     private Scanner input = new Scanner(System.in);
 
     // Constructor Injection
-    public App(IRepository repository) {
+    public LegacyApp(IRepository repository) {
         this.repository = repository;
     }
 

@@ -1,4 +1,4 @@
-package csd214.bookstore.ioc;
+package csd214.bookstore.legacy.ioc;
 import csd214.bookstore.jpa.entities.ProductEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;

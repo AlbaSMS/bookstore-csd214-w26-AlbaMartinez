@@ -1,127 +1,132 @@
 #!/bin/bash
 
-# Ensure we are in the correct directory/branch
-# git checkout step_04-services-repositories-and-ioc
+# Base directories
+BASE_PKG="src/main/java/csd214/bookstore"
+LEGACY_DIR="$BASE_PKG/legacy"
+SPRING_DIR="$BASE_PKG/spring"
 
-IOC_DIR="src/main/java/csd214/bookstore/ioc"
+# 1. Refactor: Move Old Code to Legacy
+echo "Moving manual IoC code to legacy package..."
+mkdir -p "$LEGACY_DIR"
 
-echo "Creating distinct Repository classes..."
+# Move Main and App
+mv "$BASE_PKG/Main.java" "$LEGACY_DIR/"
+mv "$BASE_PKG/App.java" "$LEGACY_DIR/"
 
-# ---------------------------------------------------------
-# 1. Create H2Repository (Specific Implementation)
-# ---------------------------------------------------------
-# This class specifically loads the 'h2-pu' configuration.
-cat <<EOF > "$IOC_DIR/H2Repository.java"
-package csd214.bookstore.ioc;
+# Move IoC package
+mv "$BASE_PKG/ioc" "$LEGACY_DIR/"
 
-import jakarta.persistence.Persistence;
+# 2. Update Package Declarations in Legacy files
+# (This uses sed to prepend .legacy to the package lines)
 
-/**
- * A concrete Repository implementation specifically for H2.
- * It hardcodes the persistence unit name "h2-pu".
- */
-public class H2Repository extends JpaRepository {
+# Fix Main.java
+sed -i 's/package csd214.bookstore;/package csd214.bookstore.legacy;/' "$LEGACY_DIR/Main.java"
+sed -i 's/import csd214.bookstore.ioc.*;/import csd214.bookstore.legacy.ioc.*;/' "$LEGACY_DIR/Main.java"
+sed -i 's/App app/LegacyApp app/' "$LEGACY_DIR/Main.java"
+sed -i 's/new App/new LegacyApp/' "$LEGACY_DIR/Main.java"
 
-    public H2Repository() {
-        // We call the parent constructor, injecting the H2-specific factory
-        super(Persistence.createEntityManagerFactory("h2-pu"), "H2 (Distinct Class)");
-    }
+# Fix App.java (Renaming to LegacyApp to avoid confusion)
+mv "$LEGACY_DIR/App.java" "$LEGACY_DIR/LegacyApp.java"
+sed -i 's/package csd214.bookstore;/package csd214.bookstore.legacy;/' "$LEGACY_DIR/LegacyApp.java"
+sed -i 's/public class App/public class LegacyApp/' "$LEGACY_DIR/LegacyApp.java"
+sed -i 's/public App(/public LegacyApp(/' "$LEGACY_DIR/LegacyApp.java"
+sed -i 's/import csd214.bookstore.ioc.IRepository;/import csd214.bookstore.legacy.ioc.IRepository;/' "$LEGACY_DIR/LegacyApp.java"
 
-    // You could add H2-specific methods here if needed
-}
-EOF
+# Fix IoC files
+find "$LEGACY_DIR/ioc" -name "*.java" -exec sed -i 's/package csd214.bookstore.ioc;/package csd214.bookstore.legacy.ioc;/' {} +
 
-# ---------------------------------------------------------
-# 2. Create MySqlRepository (Specific Implementation)
-# ---------------------------------------------------------
-# This class specifically loads the 'mysql-pu' configuration.
-cat <<EOF > "$IOC_DIR/MySqlRepository.java"
-package csd214.bookstore.ioc;
+echo "Legacy refactor complete."
 
-import jakarta.persistence.Persistence;
+# 3. Generate Spring Boot Code
+echo "Generating Spring Boot Architecture..."
+mkdir -p "$SPRING_DIR"
+mkdir -p "$SPRING_DIR/repositories"
+mkdir -p "$SPRING_DIR/controllers"
 
-/**
- * A concrete Repository implementation specifically for MySQL.
- * It hardcodes the persistence unit name "mysql-pu".
- */
-public class MySqlRepository extends JpaRepository {
+# A. Application Entry Point
+cat <<EOF > "$SPRING_DIR/BookstoreSpringApplication.java"
+package csd214.bookstore.spring;
 
-    public MySqlRepository() {
-        // We call the parent constructor, injecting the MySQL-specific factory
-        super(Persistence.createEntityManagerFactory("mysql-pu"), "MySQL (Distinct Class)");
-    }
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-    // You could add MySQL-specific optimizations here if needed
-}
-EOF
+@SpringBootApplication
+// 1. Scan for Controllers/Services in this package
+@ComponentScan(basePackages = "csd214.bookstore.spring")
+// 2. Scan for JPA Entities in the shared domain package
+@EntityScan(basePackages = "csd214.bookstore.jpa.entities")
+// 3. Scan for Magic Interfaces
+@EnableJpaRepositories(basePackages = "csd214.bookstore.spring.repositories")
+public class BookstoreSpringApplication {
 
-# ---------------------------------------------------------
-# 3. Update IoCApp to show all options
-# ---------------------------------------------------------
-cat <<EOF > "$IOC_DIR/IoCApp.java"
-package csd214.bookstore.ioc;
-
-import jakarta.persistence.Persistence;
-import java.util.Scanner;
-
-public class IoCApp {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("=== Expanded Inversion of Control Demo ===");
-        System.out.println("Select your Repository Implementation:");
-        System.out.println("1. In-Memory (Java List)");
-        System.out.println("2. Generic JPA Repo -> Injected with H2 Config");
-        System.out.println("3. Generic JPA Repo -> Injected with MySQL Config");
-        System.out.println("4. H2Repository (Distinct Class)");
-        System.out.println("5. MySqlRepository (Distinct Class)");
-        System.out.print("Choice: ");
-
-        int choice = 0;
-        try { choice = Integer.parseInt(scanner.nextLine()); } catch(Exception e) {}
-
-        IRepository repository;
-
-        // --- WIRING PHASE ---
-        switch (choice) {
-            case 1:
-                repository = new InMemoryRepository();
-                break;
-            case 2:
-                // Generic approach: We decide the config here in Main
-                repository = new JpaRepository(Persistence.createEntityManagerFactory("h2-pu"), "H2 (Generic)");
-                break;
-            case 3:
-                // Generic approach: We decide the config here in Main
-                repository = new JpaRepository(Persistence.createEntityManagerFactory("mysql-pu"), "MySQL (Generic)");
-                break;
-            case 4:
-                // Specific approach: The class itself decides the config
-                repository = new H2Repository();
-                break;
-            case 5:
-                // Specific approach: The class itself decides the config
-                repository = new MySqlRepository();
-                break;
-            default:
-                System.out.println("Invalid choice. Defaulting to In-Memory.");
-                repository = new InMemoryRepository();
-        }
-
-        // --- INJECTION PHASE ---
-        // The Service doesn't care if it's Generic, Specific, H2, or MySQL.
-        // It just wants an IRepository.
-        BookstoreService service = new BookstoreService(repository);
-
-        // --- EXECUTION PHASE ---
-        service.addBasicInventory();
-        service.listInventory();
-
-        service.performSale(1L);
-        service.listInventory();
-
-        System.exit(0);
+        SpringApplication.run(BookstoreSpringApplication.class, args);
+        System.out.println("Spring Boot Bookstore is running!");
+        System.out.println("Access data at: http://localhost:8080/products");
     }
 }
 EOF
 
-echo "Specific repositories created and IoCApp updated."
+# B. Magic Repository (Replaces ProductRepository.java)
+cat <<EOF > "$SPRING_DIR/repositories/SpringProductRepository.java"
+package csd214.bookstore.spring.repositories;
+
+import csd214.bookstore.jpa.entities.ProductEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * MAGIC INTERFACE:
+ * We do NOT write a class implementing this.
+ * Spring creates the implementation at runtime using Bytecode generation.
+ */
+@Repository
+public interface SpringProductRepository extends JpaRepository<ProductEntity, Long> {
+
+    // We get save(), findAll(), findById(), delete() automatically.
+
+    // Custom Queries via Method Naming Convention:
+    // "SELECT * FROM products WHERE price > ?"
+    List<ProductEntity> findByPriceGreaterThan(double price);
+}
+EOF
+
+# C. Basic REST Controller (To verify it works)
+cat <<EOF > "$SPRING_DIR/controllers/ProductController.java"
+package csd214.bookstore.spring.controllers;
+
+import csd214.bookstore.jpa.entities.ProductEntity;
+import csd214.bookstore.spring.repositories.SpringProductRepository;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/products")
+public class ProductController {
+
+    // DEPENDENCY INJECTION (Field injection for simplicity in demo)
+    private final SpringProductRepository repository;
+
+    public ProductController(SpringProductRepository repository) {
+        this.repository = repository;
+    }
+
+    @GetMapping
+    public List<ProductEntity> getAll() {
+        return repository.findAll();
+    }
+
+    @GetMapping("/expensive")
+    public List<ProductEntity> getExpensiveItems() {
+        return repository.findByPriceGreaterThan(20.00);
+    }
+}
+EOF
+
+echo "Spring Boot setup complete."

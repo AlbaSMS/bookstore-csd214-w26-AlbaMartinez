@@ -1,4 +1,4 @@
-package csd214.bookstore.ioc;
+package csd214.bookstore.legacy.ioc;
 
 import jakarta.persistence.Persistence;
 import java.util.Scanner;
