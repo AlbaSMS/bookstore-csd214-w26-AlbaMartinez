@@ -1,5 +1,6 @@
 target/
 volumes/
+ai*
 
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
