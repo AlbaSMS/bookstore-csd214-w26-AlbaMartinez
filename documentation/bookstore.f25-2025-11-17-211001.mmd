@@ -6,8 +6,10 @@ classDiagram
     Publication <|-- Magazine
     Magazine <|-- DiscMag
     SaleableItem <|.. Product
+    SaleableItem <|.. GiftWrap
     Serializable <|.. Product
     Product <-- CashTill
+    GiftWrap <-- CashTill
 
     class Product{
         -String productId
@@ -95,3 +97,7 @@ classDiagram
         +getPrice()
 
     }
+    class GiftWrap {
+        +sellItem()
+        +getPrice()
+ }
