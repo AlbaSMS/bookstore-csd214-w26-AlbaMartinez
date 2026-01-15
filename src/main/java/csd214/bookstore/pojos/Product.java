@@ -14,4 +14,6 @@ public abstract class Product extends Editable implements SaleableItem, Serializ
     public void setProductId(String productId) {
         this.productId = productId;
     }
+
+    public abstract void initialized();
 }
