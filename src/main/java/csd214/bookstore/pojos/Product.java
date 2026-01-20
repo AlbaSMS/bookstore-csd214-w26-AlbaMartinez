@@ -15,5 +15,5 @@ public abstract class Product extends Editable implements SaleableItem, Serializ
         this.productId = productId;
     }
 
-    public abstract void initialized();
+    public abstract void initialize();
 }
