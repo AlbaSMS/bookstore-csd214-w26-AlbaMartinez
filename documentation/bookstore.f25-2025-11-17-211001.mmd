@@ -2,8 +2,15 @@ classDiagram
     Editable <|--Product
     Product <|--Ticket
     Product <|--Publication
+    Product <|--Stationery
+    Product <|--Electronics
+    Product <|--Widget
     Publication <|-- Book
     Publication <|-- Magazine
+    Stationery <|-- Pen
+    Stationery <|-- Notebook
+    Electronics <|-- Laptop
+    Electronics <|-- Phone
     Magazine <|-- DiscMag
     SaleableItem <|.. Product
     SaleableItem <|.. GiftWrap
@@ -97,7 +104,3 @@ classDiagram
         +getPrice()
 
     }
-    class GiftWrap {
-        +sellItem()
-        +getPrice()
- }
