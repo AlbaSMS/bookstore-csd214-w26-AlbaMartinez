@@ -7,16 +7,12 @@ public class Notebook extends Stationery {
     public void initialize() {
         super.initialize();
         IO.println("Enter Page Count: ");
-    }
-
-    @Override
-    public String getBrand() {
-        
+        this.pageCount = getInput(0);
     }
 
     @Override
     public void sellItem() {
-        IO.println("Selling" + brand + "Notebook with " + pageCount + "pages...");
+        IO.println("Selling" + getBrand() + "Notebook with " + pageCount + "pages...");
     }
 
     @Override

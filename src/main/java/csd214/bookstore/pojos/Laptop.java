@@ -3,29 +3,27 @@ package csd214.bookstore.pojos;
 public class Laptop extends Electronics {
     private double screenSizeInches;
 
-    public double getScreenSizeInches() {
-        return screenSizeInches;
-    }
-
-    public void setScreenSizeInches(double screenSizeInches) {
-        this.screenSizeInches = screenSizeInches;
-    }
-
     @Override
     public void initialize() {
         super.initialize();
-        screenSizeInches = 15.6;
+        IO.println("Enter screen size (inches): ");
+        screenSizeInches = getInput(15.6);
+        IO.println("Enter warranty months: ");
+        setWarrantyMonths(getInput(getWarrantyMonths()));
     }
 
     @Override
     public void edit() {
         super.edit();
-        IO.println("Editing laptop-specific fields...");
+        IO.println("Edit screen size [" + screenSizeInches + "]: ");
+        screenSizeInches = getInput(screenSizeInches);
+        IO.println("Edit warranty months [" + getWarrantyMonths() + "]: ");
+        setWarrantyMonths(getInput(getWarrantyMonths()));
     }
 
     @Override
     public void sellItem() {
-        IO.println("Selling Laptop with a screen size of " + screenSizeInches + " inches");
+        IO.println("Selling Laptop (" + screenSizeInches + " inch screen, " + getWarrantyMonths() + " months warranty)");
     }
 
     @Override

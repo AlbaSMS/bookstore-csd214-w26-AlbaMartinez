@@ -122,8 +122,8 @@ public class App {
             System.out.println("4. DiscMags");
             System.out.println("5. Tickets");
             System.out.println("6. Widgets");
-            System.out.println("5. Stationery");
-            System.out.println("5. Electronics");
+            System.out.println("7. Stationery");
+            System.out.println("8. Electronics");
             System.out.println("99. Exit");
 
             try {
@@ -136,7 +136,7 @@ public class App {
 
             if (choice == 99) return;
 
-            Class<?> filter = null;
+            Class<?> filter;
             switch(choice) {
                 case 1: filter = null; break;
                 case 2: filter = Book.class; break;
@@ -144,8 +144,8 @@ public class App {
                 case 4: filter = DiscMag.class; break;
                 case 5: filter = Ticket.class; break;
                 case 6: filter = Widget.class; break;
-                case 6: filter = Stationery.class; break;
-                case 6: filter = Electronics.class; break;
+                case 7: filter = Stationery.class; break;
+                case 8: filter = Electronics.class; break;
                 default: System.out.println("Invalid selection."); continue;
             }
 
