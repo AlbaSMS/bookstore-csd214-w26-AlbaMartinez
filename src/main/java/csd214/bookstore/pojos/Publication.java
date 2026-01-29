@@ -1,6 +1,7 @@
 package csd214.bookstore.pojos;
 
 import java.util.Objects;
+import java.util.Scanner;
 
 public abstract class Publication extends Product {
     private String title = "";
@@ -16,33 +17,42 @@ public abstract class Publication extends Product {
         this.copies = copies;
     }
 
+
+//    // Helper used by subclasses during initialize
+//    protected void initPriceCopies() {
+//        System.out.println("Enter copies:");
+//        this.copies = getInput(0);
+//
+//        System.out.println("Enter price:");
+//        this.price = getInput(0.0);
+//    }
+
     @Override
-    public void initialize() {
+    public void initialize(Scanner input) {
         System.out.println("Enter Title:");
-        this.title = getInput("Available Title"); // "Available Title" is default if empty
+        this.title = getInput(input, "Available Title");
     }
 
-    // Helper used by subclasses during initialize
-    protected void initPriceCopies() {
+    // Pass scanner to helper
+    protected void initPriceCopies(Scanner input) {
         System.out.println("Enter copies:");
-        this.copies = getInput(0);
+        this.copies = getInput(input, 0);
 
         System.out.println("Enter price:");
-        this.price = getInput(0.0);
+        this.price = getInput(input, 0.0);
     }
 
     @Override
-    public void edit() {
+    public void edit(Scanner input) {
         System.out.println("Edit Title [" + this.title + "]:");
-        this.title = getInput(this.title);
+        this.title = getInput(input, this.title);
 
         System.out.println("Edit Price [" + this.price + "]:");
-        this.price = getInput(this.price);
+        this.price = getInput(input, this.price);
 
         System.out.println("Edit Copies [" + this.copies + "]:");
-        this.copies = getInput(this.copies);
+        this.copies = getInput(input, this.copies);
     }
-
     @Override
     public double getPrice() {
         return price;

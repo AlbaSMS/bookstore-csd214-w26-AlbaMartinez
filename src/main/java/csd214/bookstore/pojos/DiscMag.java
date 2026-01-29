@@ -1,6 +1,7 @@
 package csd214.bookstore.pojos;
 
 import java.util.Date;
+import java.util.Scanner;
 
 public class DiscMag extends Magazine {
     private boolean hasDisc;
@@ -13,20 +14,20 @@ public class DiscMag extends Magazine {
         this.hasDisc = hasDisc;
     }
 
-    @Override
-    public void initialize() {
-        super.initialize(); // Title, Qty, Date, Copies, Price
+    public void initialize(Scanner input) {
+        // Pass scanner up to parent
+        super.initialize(input);
 
         System.out.println("Has Disc? (true/false):");
-        this.hasDisc = getInput(false);
+        this.hasDisc = getInput(input, false);
     }
 
     @Override
-    public void edit() {
-        super.edit(); // Title, Price, Copies, OrderQty, Date
+    public void edit(Scanner input) {
+        super.edit(input); // Title, Price, Copies, OrderQty, Date
 
         System.out.println("Edit Has Disc [" + this.hasDisc + "]:");
-        this.hasDisc = getInput(this.hasDisc);
+        this.hasDisc = getInput(input, this.hasDisc);
     }
 
     @Override
