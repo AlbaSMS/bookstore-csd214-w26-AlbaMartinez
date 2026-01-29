@@ -19,7 +19,7 @@ public class JdbcBookApp {
 
             // 2. Create (Insert) a Book
             System.out.println("--- INSERTING BOOK ---");
-            Book newBook = new Book("J.R.R. Tolkien", "The Hobbit", 19.99, 10);
+            Book newBook = new Book("J.R.R. Tolkien", "978-0547928227", "The Hobbit", 19.99, 10);
             insertBook(newBook);
             listBooks();
 
@@ -51,7 +51,8 @@ public class JdbcBookApp {
                      "title VARCHAR(255), " +
                      "author VARCHAR(255), " +
                      "price DOUBLE, " +
-                     "copies INT)";
+                     "copies INT)" +
+                     "isbn VARCHAR(20)";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
@@ -61,7 +62,7 @@ public class JdbcBookApp {
     }
 
     private static void insertBook(Book book) throws SQLException {
-        String sql = "INSERT INTO books (title, author, price, copies) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO books (title, author, price, copies, isbn) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -70,6 +71,7 @@ public class JdbcBookApp {
             pstmt.setString(2, book.getAuthor());
             pstmt.setDouble(3, book.getPrice());
             pstmt.setInt(4, book.getCopies());
+            pstmt.setString(5, book.getIsbn());
 
             int rows = pstmt.executeUpdate();
             System.out.println("Inserted " + rows + " row(s).");
@@ -78,7 +80,7 @@ public class JdbcBookApp {
 
     private static void updateBookByTitle(Book book) throws SQLException {
         // Updating based on Title for demonstration (In real apps, use ID)
-        String sql = "UPDATE books SET price = ?, copies = ?, author = ? WHERE title = ?";
+        String sql = "UPDATE books SET price = ?, copies = ?, author = ?, isbn = ? WHERE title = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -87,6 +89,7 @@ public class JdbcBookApp {
             pstmt.setInt(2, book.getCopies());
             pstmt.setString(3, book.getAuthor());
             pstmt.setString(4, book.getTitle());
+            pstmt.setString(5, book.getIsbn());
 
             int rows = pstmt.executeUpdate();
             System.out.println("Updated " + rows + " row(s) for title: " + book.getTitle());
@@ -124,6 +127,7 @@ public class JdbcBookApp {
                 double price = rs.getDouble("price");
                 int copies = rs.getInt("copies");
                 int id = rs.getInt("id"); // Captured but not stored in POJO currently
+                String isbn = rs.getString("isbn");
 
                 System.out.printf("  [ID: %d] %s by %s ($%.2f) - %d copies%n",
                         id, title, author, price, copies);
