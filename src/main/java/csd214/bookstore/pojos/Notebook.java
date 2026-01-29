@@ -1,13 +1,17 @@
 package csd214.bookstore.pojos;
 
+import java.util.Objects;
+import java.util.Scanner;
+
 public class Notebook extends Stationery {
     private int pageCount;
+    public double price = 0;
 
     @Override
-    public void initialize() {
-        super.initialize();
+    public void initialize(Scanner input) {
+//        super.initialize(input);
         IO.println("Enter Page Count: ");
-        this.pageCount = getInput(0);
+        this.pageCount = getInput(input, 0);
     }
 
     @Override
@@ -17,6 +21,27 @@ public class Notebook extends Stationery {
 
     @Override
     public double getPrice() {
-        return 0;
+        return price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Notebook notebook = (Notebook) o;
+        return pageCount == notebook.pageCount && Double.compare(price, notebook.price) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), pageCount, price);
+    }
+
+    @Override
+    public String toString() {
+        return "Notebook{" +
+                "pageCount=" + pageCount +
+                ", price=" + price +
+                '}';
     }
 }

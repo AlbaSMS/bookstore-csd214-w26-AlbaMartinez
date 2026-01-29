@@ -1,5 +1,7 @@
 package csd214.bookstore.pojos;
 
+import java.util.Scanner;
+
 public abstract class Electronics extends Product {
     private int warrantyMonths;
 
@@ -12,12 +14,12 @@ public abstract class Electronics extends Product {
     }
 
     @Override
-    public void initialize() {
+    public void initialize(Scanner input) {
         warrantyMonths = 12; // Default
     }
 
     @Override
-    public void edit() {
+    public void edit(Scanner input) {
         IO.println("Editing electronic item...");
     }
 }

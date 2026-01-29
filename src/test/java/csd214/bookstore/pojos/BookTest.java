@@ -1,117 +1,80 @@
 package csd214.bookstore.pojos;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
-
+import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BookTest {
 
-    private final InputStream originalSystemIn = System.in;
-    private final PrintStream originalSystemOut = System.out;
-    private ByteArrayOutputStream outputStreamCaptor;
-
-    @BeforeEach
-    void setUp() {
-        // Capture output if needed for assertions
-        outputStreamCaptor = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStreamCaptor));
-    }
-
-    @AfterEach
-    void tearDown() {
-        // Restore standard streams
-        System.setIn(originalSystemIn);
-        System.setOut(originalSystemOut);
+    // Helper method to create a Scanner from a String
+    private Scanner createMockScanner(String input) {
+        return new Scanner(new ByteArrayInputStream(input.getBytes()));
     }
 
     @Test
     void testConstructorAndGetters() {
-        Book book = new Book("J.K. Rowling", "Harry Potter", 29.99, 10);
+        // Standard OOP test - no Scanner involved
+        Book book = new Book("Frank Herbert", "Dune", 50.0, 10);
 
-        assertEquals("Harry Potter", book.getTitle());
-        assertEquals("J.K. Rowling", book.getAuthor());
-        assertEquals(29.99, book.getPrice());
+        assertEquals("Dune", book.getTitle());
+        assertEquals("Frank Herbert", book.getAuthor());
+        assertEquals(50.0, book.getPrice());
         assertEquals(10, book.getCopies());
     }
 
     @Test
-    void testSellItem() {
-        Book book = new Book("Author", "Title", 20.0, 5);
+    void testInitialize_PopulatesFieldsCorrectly() {
+        // 1. Prepare the Script
+        // Order in Code:
+        //   1. super.initialize() -> Title
+        //   2. this.initialize()  -> Author
+        //   3. super.initPriceCopies() -> Copies
+        //   4. super.initPriceCopies() -> Price
+        String inputData = "Dune\nFrank Herbert\n10\n25.00\n";
+        Scanner mockScanner = createMockScanner(inputData);
 
-        book.sellItem();
-
-        assertEquals(4, book.getCopies(), "Copies should decrease by 1 after sale");
-    }
-
-    @Test
-    void testInitializeWithMockInput() {
-        // Simulate User Input:
-        // 1. Title (Publication.initialize)
-        // 2. Author (Book.initialize)
-        // 3. Copies (Publication.initPriceCopies)
-        // 4. Price  (Publication.initPriceCopies)
-        String simulatedInput = "The Hobbit\nJ.R.R. Tolkien\n15\n19.95\n";
-
-        ByteArrayInputStream testIn = new ByteArrayInputStream(simulatedInput.getBytes());
-
+        // 2. Execute
         Book book = new Book();
-        // Inject the mock stream
-        book.setSystemInput(testIn);
+        book.initialize(mockScanner); // Dependency Injection!
 
-        book.initialize();
-
-        assertEquals("The Hobbit", book.getTitle());
-        assertEquals("J.R.R. Tolkien", book.getAuthor());
-        assertEquals(15, book.getCopies());
-        assertEquals(19.95, book.getPrice(), 0.001);
+        // 3. Verify
+        assertEquals("Dune", book.getTitle());
+        assertEquals("Frank Herbert", book.getAuthor());
+        assertEquals(10, book.getCopies());
+        assertEquals(25.00, book.getPrice(), 0.001);
     }
 
     @Test
-    void testEditWithMockInput() {
-        // Start with existing data
+    void testEdit_UpdatesFieldsAndKeepsOthers() {
+        // 1. Setup Initial State
         Book book = new Book("Old Author", "Old Title", 10.0, 5);
 
-        // Simulate User Input for edit():
-        // 1. Title (Publication.edit) -> "New Title"
-        // 2. Price (Publication.edit) -> "50.0"
-        // 3. Copies (Publication.edit) -> "100"
-        // 4. Author (Book.edit)        -> "New Author"
-        String simulatedInput = "New Title\n50.0\n100\nNew Author\n";
+        // 2. Prepare the Script
+        // Order in Code:
+        //   1. super.edit() -> Title
+        //   2. super.edit() -> Price
+        //   3. super.edit() -> Copies
+        //   4. this.edit()  -> Author
 
-        ByteArrayInputStream testIn = new ByteArrayInputStream(simulatedInput.getBytes());
-        book.setSystemInput(testIn);
+        // Scenario: Change Title to "New Title", Keep Price, Keep Copies, Change Author
+        String inputData = "New Title\n\n\nNew Author\n";
+        Scanner mockScanner = createMockScanner(inputData);
 
-        book.edit();
+        // 3. Execute
+        book.edit(mockScanner);
 
-        assertEquals("New Title", book.getTitle());
-        assertEquals("New Author", book.getAuthor());
-        assertEquals(50.0, book.getPrice(), 0.001);
-        assertEquals(100, book.getCopies());
+        // 4. Verify
+        assertEquals("New Title", book.getTitle());   // Changed
+        assertEquals(10.0, book.getPrice(), 0.001);   // Kept (from \n)
+        assertEquals(5, book.getCopies());            // Kept (from \n)
+        assertEquals("New Author", book.getAuthor()); // Changed
     }
 
     @Test
-    void testEditWithEmptyInputPreservesValues() {
-        // If user hits 'Enter' (empty string), values should remain unchanged.
-        Book book = new Book("Old Author", "Old Title", 10.0, 5);
-
-        // Simulate empty inputs (newlines)
-        String simulatedInput = "\n\n\n\n";
-
-        ByteArrayInputStream testIn = new ByteArrayInputStream(simulatedInput.getBytes());
-        book.setSystemInput(testIn);
-
-        book.edit();
-
-        assertEquals("Old Title", book.getTitle());
-        assertEquals("Old Author", book.getAuthor());
-        assertEquals(10.0, book.getPrice());
-        assertEquals(5, book.getCopies());
+    void testSellItem_DecrementsCopies() {
+        Book book = new Book("Author", "Title", 10.0, 5);
+        book.sellItem();
+        assertEquals(4, book.getCopies());
     }
 }

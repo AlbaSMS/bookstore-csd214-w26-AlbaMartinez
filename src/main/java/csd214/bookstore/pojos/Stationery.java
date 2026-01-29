@@ -1,6 +1,7 @@
 package csd214.bookstore.pojos;
 
 import java.util.Objects;
+import java.util.Scanner;
 
 public abstract class Stationery extends Product {
     private String brand;
@@ -33,19 +34,19 @@ public abstract class Stationery extends Product {
     public int hashCode() { return Objects.hashCode(getBrand()); }
 
     @Override
-    public void initialize() {
-        // super.initialize();;
+    public void initialize(Scanner input) {
+        // super.initialize(input);;
         IO.println("Enter brand: ");
         // this.brand = getInput("Generic");
-        setBrand(getInput("Generic"));
+        setBrand(getInput(input, "Generic"));
     }
 
     @Override
-    public void edit() {
+    public void edit(Scanner input) {
         // 1. Edit Parent fields (Title, Price, Copies)
-        // super.edit();
+        // super.edit(input);
         // 2. Edit Self fields
         IO.println("Edit Author [" + this.brand + "]: ");
-        this.brand = getInput(this.brand);
+        this.brand = getInput(input, this.brand);
     }
 }
