@@ -7,7 +7,7 @@ public class Phone extends Electronics {
     private boolean supports5G;
     public double price;
 
-    public Phone(int copies, boolean supports5G, double price) {
+    public Phone(String brand, boolean supports5G, double price, int copies) {
         this.copies = copies;
     }
 
@@ -32,11 +32,6 @@ public class Phone extends Electronics {
         price = supports5G ? 999.99 : 799.99;
         IO.println("Warranty months [" + getWarrantyMonths() + "]: ");
         setWarrantyMonths(getInput(input, getWarrantyMonths()));
-    }
-
-    @Override
-    public void sellItem() {
-        IO.println("Selling Phone (" + (supports5G ? "5G enabled" : "No 5G") + ", " + getWarrantyMonths() + " months warranty)");
     }
 
     @Override

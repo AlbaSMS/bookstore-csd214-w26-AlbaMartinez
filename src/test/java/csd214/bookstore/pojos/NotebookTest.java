@@ -13,6 +13,6 @@ public class NotebookTest {
 
         assertEquals(n1, n2, "Notebooks with same state should be equal");
         assertEquals(n1.hashCode(), n2.hashCode(), "HashCodes must match");
-        assertNotEquals(n1, n3, "Different color notebook should not be equal");
+        assertNotEquals(n1, n3, "Different page count notebooks should not be equal");
     }
 }

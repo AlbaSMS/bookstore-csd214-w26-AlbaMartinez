@@ -6,8 +6,13 @@ import java.util.Scanner;
 public abstract class Electronics extends Product {
     private int warrantyMonths = 12;
     private String brand;
-
     protected int copies;
+
+    public Electronics() { }
+
+    public Electronics(String brand) {
+        this.brand = brand;
+    }
 
     public int getCopies() {
         return copies;
@@ -16,12 +21,6 @@ public abstract class Electronics extends Product {
     public void setCopies(int copies) {
         this.copies = copies;
     }
-
-    public Electronics(String brand) {
-        this.brand = brand;
-    }
-
-    public Electronics() { }
 
     public String getBrand() {
         return brand;
@@ -40,12 +39,6 @@ public abstract class Electronics extends Product {
     }
 
     @Override
-    public void sellItem() {
-        setCopies(copies - 1);
-        }
-    }
-
-    @Override
     public void initialize(Scanner input) {
         IO.println("Enter brand: ");
         setBrand(getInput(input, "Generic"));
@@ -55,6 +48,11 @@ public abstract class Electronics extends Product {
     public void edit(Scanner input) {
         IO.println("Edit Brand [" + this.brand + "]: ");
         this.brand = getInput(input, this.brand);
+    }
+
+    @Override
+    public void sellItem() {
+        setCopies(copies - 1);
     }
 
     @Override
