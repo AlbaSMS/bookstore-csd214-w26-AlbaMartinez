@@ -7,6 +7,13 @@ public class Phone extends Electronics {
     private boolean supports5G;
     public double price;
 
+    public Phone(int copies, boolean supports5G, double price) {
+        this.copies = copies;
+    }
+
+    public Phone() {
+    }
+
     @Override
     public void initialize(Scanner input) {
         super.initialize(input);
@@ -38,19 +45,23 @@ public class Phone extends Electronics {
     }
 
     @Override
-    public String toString() {
-        return "Phone{5G?='" + supports5G + "', price=" + price + "}";
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         Phone phone = (Phone) o;
         return supports5G == phone.supports5G && Double.compare(price, phone.price) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(supports5G, price);
+        return Objects.hash(super.hashCode(), supports5G, price);
+    }
+
+    @Override
+    public String toString() {
+        return "Phone{" +
+                "supports5G=" + supports5G +
+                ", price=" + price +
+                '}';
     }
 }

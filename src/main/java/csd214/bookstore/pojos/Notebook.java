@@ -7,6 +7,15 @@ public class Notebook extends Stationery {
     private int pageCount;
     public double price = 0;
 
+    public Notebook() {
+        super();
+    }
+
+    public Notebook(String brand, int pageCount) {
+        super(brand);
+        this.pageCount = pageCount;
+    }
+
     @Override
     public void initialize(Scanner input) {
 //        super.initialize(input);

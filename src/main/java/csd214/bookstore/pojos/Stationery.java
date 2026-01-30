@@ -6,6 +6,10 @@ import java.util.Scanner;
 public abstract class Stationery extends Product {
     private String brand;
 
+    public Stationery(String brand) {
+        this.brand = brand;
+    }
+
     public String getBrand() {
         return brand;
     }
@@ -14,8 +18,7 @@ public abstract class Stationery extends Product {
         this.brand = brand;
     }
 
-    public Stationery() {
-    }
+    public Stationery() {}
 
     @Override
     public String toString() {
@@ -46,7 +49,7 @@ public abstract class Stationery extends Product {
         // 1. Edit Parent fields (Title, Price, Copies)
         // super.edit(input);
         // 2. Edit Self fields
-        IO.println("Edit Author [" + this.brand + "]: ");
+        IO.println("Edit Brand [" + this.brand + "]: ");
         this.brand = getInput(input, this.brand);
     }
 }

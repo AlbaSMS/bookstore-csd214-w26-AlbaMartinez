@@ -14,6 +14,8 @@ import java.util.Scanner;
 
 
 public abstract class Editable implements Serializable, SaleableItem {
+    public Editable() {
+    }
 //    private Long id;
 
     public abstract void edit(Scanner input);

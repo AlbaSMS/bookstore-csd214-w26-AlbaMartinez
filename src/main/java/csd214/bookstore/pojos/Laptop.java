@@ -5,7 +5,23 @@ import java.util.Scanner;
 
 public class Laptop extends Electronics {
     private double screenSizeInches;
-    public double price = 1299.99;
+    private double price;
+
+    public Laptop() {
+    }
+
+    public Laptop(String brand, double screenSizeInches, double warrantyMonths) {
+        super(brand);
+        this.screenSizeInches = screenSizeInches;
+    }
+
+    public double getScreenSizeInches() {
+        return screenSizeInches;
+    }
+
+    public void setScreenSizeInches(double screenSizeInches) {
+        this.screenSizeInches = screenSizeInches;
+    }
 
     @Override
     public void initialize(Scanner input) {
@@ -36,11 +52,6 @@ public class Laptop extends Electronics {
     }
 
     @Override
-    public String toString() {
-        return "Laptop{size='" + screenSizeInches + "', price=" + price + "}";
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Laptop laptop = (Laptop) o;
@@ -50,5 +61,13 @@ public class Laptop extends Electronics {
     @Override
     public int hashCode() {
         return Objects.hash(screenSizeInches, price);
+    }
+
+    @Override
+    public String toString() {
+        return "Laptop{" +
+                "screenSizeInches=" + screenSizeInches +
+                ", price=" + price +
+                '}';
     }
 }

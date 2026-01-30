@@ -1,6 +1,7 @@
 package csd214.bookstore.pojos;
 
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.UUID;
 
 public class Widget extends Product {
@@ -8,6 +9,7 @@ public class Widget extends Product {
     private double price;
 
     public Widget() { setWidgetName("Default Widget Name"); }
+
     public Widget(String name, double price) {
         // set the productId
         setProductId(UUID.randomUUID().toString());
@@ -20,16 +22,16 @@ public class Widget extends Product {
     public void setWidgetName(String widgetName) { this.widgetName = widgetName; }
 
     @Override
-    public void edit() {
-        IO.println("Enter Widget name (<"+getWidgetName()+">) ' ");
+    public void edit(Scanner input) {
+        IO.println("Enter Widget name (<" + getWidgetName() + ">) ' ");
     }
 
     @Override
-    public void initialize() {
+    public void initialize(Scanner input) {
         IO.println("Enter Widget name (<Default Widget Name>) : ");
-        setWidgetName(getInput("Default Widget Name"));
+        setWidgetName(getInput(input, "Default Widget Name"));
         IO.println("Enter Widget price (<0>) : ");
-        setPrice(getInput(0.0d));
+        setPrice(getInput(input, 0.0d));
     }
 
     @Override
