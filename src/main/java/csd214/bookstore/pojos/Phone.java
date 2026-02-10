@@ -2,6 +2,7 @@ package csd214.bookstore.pojos;
 
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Phone extends Electronics {
     private boolean supports5G;
@@ -9,9 +10,19 @@ public class Phone extends Electronics {
 
     public Phone(String brand, boolean supports5G, double price, int copies) {
         this.copies = copies;
+        // set the productId
+        setProductId(UUID.randomUUID().toString());
     }
 
     public Phone() {
+    }
+
+    public boolean isSupports5G() {
+        return supports5G;
+    }
+
+    public void setSupports5G(boolean supports5G) {
+        this.supports5G = supports5G;
     }
 
     @Override

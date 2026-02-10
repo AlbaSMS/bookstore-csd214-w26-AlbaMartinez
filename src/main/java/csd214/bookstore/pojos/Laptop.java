@@ -2,6 +2,7 @@ package csd214.bookstore.pojos;
 
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Laptop extends Electronics {
     private double screenSizeInches;
@@ -13,6 +14,8 @@ public class Laptop extends Electronics {
     public Laptop(String brand, double screenSizeInches, double warrantyMonths) {
         super(brand);
         this.screenSizeInches = screenSizeInches;
+        // set the productId
+        setProductId(UUID.randomUUID().toString());
     }
 
     public double getScreenSizeInches() {

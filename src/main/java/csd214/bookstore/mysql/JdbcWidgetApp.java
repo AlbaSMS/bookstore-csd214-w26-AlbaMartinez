@@ -1,7 +1,7 @@
 package csd214.bookstore.mysql;
 import csd214.bookstore.pojos.Widget;
 import java.sql.*;
-import java.util.UUID;
+
 public class JdbcWidgetApp {
     private static final String URL = "jdbc:mysql://localhost:3333/bookstore";
     private static final String USER = "csd214";

@@ -80,5 +80,4 @@ public class Widget extends Product {
     public int hashCode() {
         return Objects.hash(getWidgetName(), getPrice());
     }
-
 }
