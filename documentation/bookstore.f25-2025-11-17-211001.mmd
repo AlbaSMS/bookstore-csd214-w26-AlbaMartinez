@@ -1,106 +1,175 @@
 classDiagram
-    Editable <|--Product
-    Product <|--Ticket
-    Product <|--Publication
-    Product <|--Stationery
-    Product <|--Electronics
-    Product <|--Widget
-    Publication <|-- Book
-    Publication <|-- Magazine
-    Stationery <|-- Pen
-    Stationery <|-- Notebook
-    Electronics <|-- Laptop
-    Electronics <|-- Phone
-    Magazine <|-- DiscMag
-    SaleableItem <|.. Product
-    SaleableItem <|.. GiftWrap
-    Serializable <|.. Product
-    Product <-- CashTill
-    GiftWrap <-- CashTill
-
-    class Product{
-        -String productId
-    }
-
-    class Serializable{
-        <<interface>>
-    }
-    class Ticket{
-        +description
-        +price
-        +sellItem()
-    }
-    class Editable{
-        <<abstract>>
-        -Scanner input
-        +String getInput(String)
-        +int getInput(int)
-        +double getInput(double)
-        +boolean getInput(boolean)
-        +Date getInput(Date)
-        +Enum getInput(Enum)
-        +edit()*
-        +initialize()*
-
-    }
-    class Publication{
-        <<Abstract>>
-        -String title
-        -double price
-        -int copies
-        +getPrice()
-
-        +Publication()
-        +Publication(String title, double price, int copies)
-        +toString()
-        +equals()
-        +hashCode()
-
-    }
-    class Book{
-        -String author
-        +edit()
-        +initialize()
-        +sellItem()
-
-        +Book()
-        +Book(String author)
-        +Book(String author, String title, double price, int copies)
-        +toString()
-        +equals()
-        +hashCode()
-
-    }
-    class Magazine{
-        -int orderQty
-        -java.util.Date currentIssue
-
-        +Magazine()
-        +Magazine(int orderQty, Date currentIssue, String title, double price, int copies)
-
-        +edit()
-        +initialize()
-        +sellItem()
-    }
-    class DiscMag{
-        -boolean hasDisc
-        +edit()
-        +initialize()
-        +sellItem()
-
-        +DiscMag()
-        +DiscMag(boolean, hasDisc, int orderQty, Date currentIssue, String title, double price, int copies)
-
-    }
-    class CashTill{
-        -double runningTotal
-        +CashTill()
-        +showTotal()
-        +sellItem(SaleableItem item)
-    }
+    %% Interfaces and Abstracts
     class SaleableItem {
         <<interface>>
         +sellItem()
-        +getPrice()
-
+        +getPrice() double
     }
+
+    class Serializable {
+        <<interface>>
+    }
+
+    class Editable {
+        <<abstract>>
+        +initialize(Scanner)
+        +edit(Scanner)
+        +getInput(Scanner, String) String
+        +getInput(Scanner, int) int
+        +getInput(Scanner, double) double
+        +getInput(Scanner, boolean) boolean
+        +getInput(Scanner, Date) Date
+    }
+
+    class Product {
+        <<abstract>>
+        -String productId
+        -String name
+        -double price
+        +Product()
+        +Product(String, String, double)
+    }
+
+    %% Base Categories
+    class Publication {
+        <<abstract>>
+        -String title
+        -int copies
+        +Publication(String, double, int)
+    }
+
+    class Vehicle {
+        -String make
+        -String model
+        -int year
+        -int mileage
+        +Vehicle(String, String, double, String, String, int, int)
+    }
+
+    class Stationery {
+        <<abstract>>
+        -String brand
+        +Stationery(String, double)
+    }
+
+    class Electronics {
+        <<abstract>>
+        -int warrantyMonths
+        -String brand
+        -int copies
+        +Electronics(String, String, double, int, String, int)
+    }
+
+    %% Concrete Classes
+    class Ticket {
+        -String description
+        +Ticket(String, double)
+    }
+
+    class Widget {
+        -String widgetName
+        -double price
+        +Widget(String, double)
+    }
+
+    class Book {
+        -String author
+        +Book(String, String, double, int)
+    }
+
+    class Magazine {
+        -int orderQty
+        -Date currentIssue
+        +Magazine(int, Date, String, double, int)
+    }
+
+    class DiscMag {
+        -boolean hasDisc
+        +DiscMag(boolean, int, Date, String, double, int)
+    }
+
+    class Pen {
+        -String color
+        +Pen(String, double, String)
+    }
+
+    class Notebook {
+        -int pageCount
+        +Notebook(String, double, int)
+    }
+
+    class Car {
+        -int numDoors
+        -String fuelType
+        +Car(..., int, String)
+    }
+
+    class Truck {
+        -double towingCapacity
+        +Truck(..., double)
+    }
+
+    class Laptop {
+        -String brand
+        -double screenSizeInches
+        -double warrantyMonths
+        +Laptop(..., String, double, double)
+    }
+    class Phone {
+        -String brand
+        -boolean supports5G
+        -double price
+        -int copies
+        +Phone(..., String, boolean, double, int)
+    }
+
+    %% Application Logic
+    class CashTill {
+        -double runningTotal
+        +sellItem(SaleableItem)
+        +showTotal()
+    }
+
+    class App {
+        -List~SaleableItem~ items
+        -CashTill cashTill
+        -Scanner input
+        +run()
+        +populate()
+        +addItem()
+        +editItem()
+        +sellItem()
+    }
+
+    class Main {
+        +main(String[])
+    }
+
+    %% Relationships
+    SaleableItem <|.. Editable
+    Serializable <|.. Editable
+    Editable <|-- Product
+
+    Product <|-- Publication
+    Product <|-- Vehicle
+    Product <|-- Stationery
+    Product <|-- Ticket
+    Product <|-- Widget
+    Product <|-- Electronics
+
+    Publication <|-- Book
+    Publication <|-- Magazine
+    Magazine <|-- DiscMag
+
+    Stationery <|-- Pen
+    Stationery <|-- Notebook
+
+    Vehicle <|-- Car
+    Vehicle <|-- Truck
+
+    Electronics <|-- Laptop
+    Electronics <|-- Phone
+
+    App o-- SaleableItem : manages
+    App --> CashTill : uses
+    Main --> App : creates

@@ -1,6 +1,6 @@
 package csd214.bookstore.mysql;
 
-import csd214.bookstore.pojos.*;
+import csd214.bookstore.pojos.Phone;
 import java.sql.*;
 
 public class JdbcPhoneApp {
@@ -35,7 +35,7 @@ public class JdbcPhoneApp {
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                 "product_id VARCHAR(36), " +
                 "brand VARCHAR(255), " +
-                "support5G BIT," +
+                "supports5G BIT," +
                 "price DOUBLE," +
                 "copies INT)";
         try (Statement stmt = conn.createStatement()) {
@@ -60,7 +60,7 @@ public class JdbcPhoneApp {
         String sql = "SELECT * FROM phones";
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                System.out.printf("ID: %d | UUID: %s | Brand: %s | Supports 5G? %b | Price: $%.2f%n | Copies: %d",
+                System.out.printf("ID: %d | UUID: %s | Brand: %s | Supports 5G? %b | Price: $%.2f%n | Copies: %d%n",
                         rs.getInt("id"),
                         rs.getString("product_id"),
                         rs.getString("brand"),
@@ -71,7 +71,7 @@ public class JdbcPhoneApp {
         }
     }
     private static void updatePhonePrice(Connection conn, String brand, boolean supports5G, double newPrice, int copies) throws SQLException {
-        String sql = "UPDATE phones SET price = ? WHERE brand = ?";
+        String sql = "UPDATE phones SET price = ? WHERE brand = ? AND supports5G = ? AND copies = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, newPrice);
             ps.setString(2, brand);
@@ -83,7 +83,7 @@ public class JdbcPhoneApp {
     }
 
     private static void deletePhone(Connection conn, String brand, boolean supports5G, int copies) throws SQLException {
-        String sql = "DELETE FROM phones WHERE brand = ?";
+        String sql = "DELETE FROM phones WHERE brand = ? AND supports5G = ? AND copies = ?";
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, brand);
             ps.setBoolean(2, supports5G);

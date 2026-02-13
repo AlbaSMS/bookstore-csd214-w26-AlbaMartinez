@@ -1,10 +1,10 @@
 package csd214.bookstore.mysql;
 
-import csd214.bookstore.pojos.Widget;
-import java.sql.*;
-import java.util.UUID;
+import csd214.bookstore.pojos.Pen;
 
-public class JdbcWidgetApp {
+import java.sql.*;
+
+public class JdbcPenApp {
     private static final String URL = "jdbc:mysql://localhost:3333/bookstore";
     private static final String USER = "csd214";
     private static final String PASS = "itstudies12345";
@@ -14,73 +14,76 @@ public class JdbcWidgetApp {
             createTable(conn);
             // 2. Insert
             System.out.println("--- INSERTING ---");
-            Widget w1 = new Widget("Super Widget", 19.99);
-            insertWidget(conn, w1);
+            Pen pen=new Pen("BIC", "RED", 2.99);
+            insertPen(conn, pen);
             // 3. Read
             System.out.println("--- READING ---");
-            listWidgets(conn);
+            listPens(conn);
             // 4. Update
             System.out.println("--- UPDATING ---");
-            updateWidgetPrice(conn, "Super Widget", 25.50);
+            updatePenPrice(conn, "BIC", 25.50);
 
             // 5. Delete
             System.out.println("--- DELETING ---");
-            deleteWidget(conn, "Super Widget");
-            listWidgets(conn);
+            deletePen(conn, "BIC");
+            listPens(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     private static void createTable(Connection conn) throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS widgets (" +
+        String sql = "CREATE TABLE IF NOT EXISTS pens (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                 "product_id VARCHAR(36), " +
-                "widget_name VARCHAR(255), " +
+                "brand VARCHAR(255), " +
+                "color VARCHAR(255), " +
                 "price DOUBLE)";
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-            System.out.println("Table 'widgets' ready.");
+            System.out.println("Table 'pens' ready.");
         }
     }
-    private static void insertWidget(Connection conn, Widget w) throws SQLException {
+    private static void insertPen(Connection conn, Pen p) throws SQLException {
         // SECURITY: Use ? to prevent SQL Injection
-        String sql = "INSERT INTO widgets (product_id, widget_name, price) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO pens (product_id, brand, color, price ) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, w.getProductId()); // UUID
-            ps.setString(2, w.getWidgetName());
-            ps.setDouble(3, w.getPrice());
+            ps.setString(1, p.getProductId()); // UUID
+            ps.setString(2, p.getBrand());
+            ps.setString(3, p.getColor());
+            ps.setDouble(4, p.getPrice());
             ps.executeUpdate();
-            System.out.println("Saved: " + w.getWidgetName());
+            System.out.println("Saved: " + p.toString());
         }
     }
-    private static void listWidgets(Connection conn) throws SQLException {
-        String sql = "SELECT * FROM widgets";
+    private static void listPens(Connection conn) throws SQLException {
+        String sql = "SELECT * FROM pens";
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                System.out.printf("ID: %d | UUID: %s | Name: %s | Price: $%.2f%n",
+                System.out.printf("ID: %d | UUID: %s | Brand: %s | Color: %s | Price: $%.2f%n",
                         rs.getInt("id"),
                         rs.getString("product_id"),
-                        rs.getString("widget_name"),
+                        rs.getString("brand"),
+                        rs.getString("color"),
                         rs.getDouble("price"));
             }
         }
     }
-    private static void updateWidgetPrice(Connection conn, String name, double newPrice) throws SQLException {
-        String sql = "UPDATE widgets SET price = ? WHERE widget_name = ?";
+    private static void updatePenPrice(Connection conn, String brand, double newPrice) throws SQLException {
+        String sql = "UPDATE pens SET price = ? WHERE brand = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, newPrice);
-            ps.setString(2, name);
+            ps.setString(2, brand);
             int rows = ps.executeUpdate();
-            System.out.println("Updated " + rows + " widget(s).");
+            System.out.println("Updated " + rows + " pen(s).");
         }
     }
 
-    private static void deleteWidget(Connection conn, String name) throws SQLException {
-        String sql = "DELETE FROM widgets WHERE widget_name = ?";
+    private static void deletePen(Connection conn, String brand) throws SQLException {
+        String sql = "DELETE FROM pens WHERE brand = ?";
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, name);
+            ps.setString(1, brand);
             ps.executeUpdate();
-            System.out.println("Deleted widget: " + name);
+            System.out.println("Deleted pen: " + brand);
         }
     }
 }

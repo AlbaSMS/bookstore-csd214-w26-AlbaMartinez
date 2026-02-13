@@ -1,6 +1,5 @@
 package csd214.bookstore.pojos;
 
-import java.io.*;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,24 +7,23 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Scanner;
 
-/**
- * @author fcarella
- */
-
-
 public abstract class Editable implements Serializable, SaleableItem {
-    public Editable() {
-    }
-//    private Long id;
 
+    // REMOVED: public Scanner input = new Scanner(System.in);
+    // REMOVED: setSystemInput() - No longer needed, we inject manually.
+
+    // 1. Update Abstract Methods to accept the dependency
     public abstract void edit(Scanner input);
     public abstract void initialize(Scanner input);
 
+    // 2. Update Helper methods to use the passed Scanner
     public String getInput(Scanner input, String defaultValue) {
+        // Handle empty buffer issues by reading raw
         String ss = input.nextLine();
         if (ss.trim().isEmpty()) {
             return defaultValue;
         }
+        // Return the raw string (no need for second scanner here usually)
         return ss.trim();
     }
 
@@ -52,6 +50,7 @@ public abstract class Editable implements Serializable, SaleableItem {
             return defaultValue;
         }
     }
+
     public boolean getInput(Scanner input, boolean defaultValue) {
         String s = input.nextLine();
         if (s.trim().isEmpty()) {
@@ -69,7 +68,7 @@ public abstract class Editable implements Serializable, SaleableItem {
         try {
             return formatter.parse(s.trim());
         } catch (ParseException e) {
-            IO.println("Invalid Date. Keeping default.");
+            System.out.println("Invalid Date. Keeping default.");
             return defaultValue;
         }
     }

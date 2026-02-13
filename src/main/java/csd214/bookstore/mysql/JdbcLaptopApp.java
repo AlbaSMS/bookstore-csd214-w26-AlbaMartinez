@@ -1,6 +1,6 @@
 package csd214.bookstore.mysql;
+
 import csd214.bookstore.pojos.Laptop;
-import csd214.bookstore.pojos.Widget;
 import java.sql.*;
 
 public class JdbcLaptopApp {
@@ -9,7 +9,7 @@ public class JdbcLaptopApp {
     private static final String PASS = "itstudies12345";
     public static void main(String[] args) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASS)) {
-            // 1. Create TableV
+            // 1. Create Table
             createTable(conn);
             // 2. Insert
             System.out.println("--- INSERTING ---");
@@ -17,7 +17,7 @@ public class JdbcLaptopApp {
             insertLaptop(conn, l1);
             // 3. Read
             System.out.println("--- READING ---");
-            listLaptop(conn);
+            listLaptops(conn);
             // 4. Update
             System.out.println("--- UPDATING ---");
             updateLaptopWarrantyMonths(conn, "Lenovo", 16.5, 18);
@@ -25,7 +25,7 @@ public class JdbcLaptopApp {
             // 5. Delete
             System.out.println("--- DELETING ---");
             deleteLaptop(conn, "Lenovo");
-            listLaptop(conn);
+            listLaptops(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -35,7 +35,7 @@ public class JdbcLaptopApp {
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                 "product_id VARCHAR(36), " +
                 "brand VARCHAR(255), " +
-                "screenSizeInches DOUBLE)" +
+                "screenSizeInches DOUBLE," +
                 "warrantyMonths DOUBLE)";
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
@@ -54,31 +54,32 @@ public class JdbcLaptopApp {
             System.out.println("Saved: " + l.getBrand());
         }
     }
-    private static void listLaptop(Connection conn) throws SQLException {
+    private static void listLaptops(Connection conn) throws SQLException {
         String sql = "SELECT * FROM laptops";
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                System.out.printf("ID: %d | UUID: %s | Brand: %s | Screen Size Inches: $%.2f%n | Warranty Months: $%.2f%n",
+                System.out.printf("ID: %d | UUID: %s | Brand: %s | Screen Size Inches: %.2f%n | Warranty Months: %.2f%n",
                         rs.getInt("id"),
                         rs.getString("product_id"),
-                        rs.getString("laptop_brand"),
-                        rs.getDouble("warranty_months"),
-                        rs.getDouble("screen_size_inches"));
+                        rs.getString("brand"),
+                        rs.getDouble("screenSizeInches"),
+                        rs.getDouble("warrantyMonths"));
             }
         }
     }
     private static void updateLaptopWarrantyMonths(Connection conn, String brand, double screenSizeInches, double newWarrantyMonths) throws SQLException {
-        String sql = "UPDATE laptops SET warrantyMonths = ? WHERE laptop_brand = ?";
+        String sql = "UPDATE laptops SET warrantyMonths = ? WHERE brand = ? AND screenSizeInches = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, newWarrantyMonths);
             ps.setString(2, brand);
+            ps.setDouble(3, screenSizeInches);
             int rows = ps.executeUpdate();
             System.out.println("Updated " + rows + " laptop(s).");
         }
     }
 
     private static void deleteLaptop(Connection conn, String brand) throws SQLException {
-        String sql = "DELETE FROM laptops WHERE laptop_brand = ?";
+        String sql = "DELETE FROM laptops WHERE brand = ?";
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, brand);
             ps.executeUpdate();
